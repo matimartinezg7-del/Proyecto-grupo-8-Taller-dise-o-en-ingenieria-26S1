@@ -11,7 +11,6 @@ correctos del alimento (nombre, fecha de ingreso y fecha de expiración).
 Condiciones: ESP32 + RC522 alimentados y conectados a WiFi, bot
 de Telegram configurado, Monitor Serial abierto a 115200 baudios.
 Procedimiento:
-
 Acercar una etiqueta RFID registrada al lector.
 Verificar en el Monitor Serial que se lee el UID y se identifica el alimento.
 Comprobar que llega el mensaje al chat de Telegram.
@@ -25,7 +24,6 @@ de Telegram llega con la información correspondiente al alimento escaneado.
 Resultado: Se probaron varias etiquetas; todas se leyeron
 correctamente y el mensaje de Telegram llegó con los datos correctos en todos
 los casos, incluyendo el caso en que el UID no este registrado en el cual muestra UID no reconocido.
-Evidencia:
 
 Falla detectada y solución (análisis técnico)
 
@@ -76,7 +74,7 @@ Criterio de éxito: los 3 registros persisten y muestran fecha/hora reales
 (no la fecha por defecto 1/1/1970), lo que confirma que la sincronización NTP
 funciona.
 Resultado: Se dio que los registros se completaron 
-Evidencia:
+
 
 
 
@@ -98,7 +96,6 @@ al registrar un alimento nuevo, sin recargar la página.
 Criterio de éxito: el color y el orden coinciden con lo esperado en los 3
 casos, y el alimento nuevo aparece solo gracias al listener onValue.
 Resultado: El color coincide con lo que se propone para todos los casos posibles y esta ordenado de manera correcta.
-Evidencia: 
 
 
 
