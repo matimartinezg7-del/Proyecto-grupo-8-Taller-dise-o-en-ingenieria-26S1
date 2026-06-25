@@ -9,17 +9,17 @@
 #include <FirebaseESP8266.h>
 
 // -------- WIFI --------
-const char* ssid = "iPhone de mati";
-const char* password = "mati9952";
+const char* ssid = "ssid";
+const char* password = "contraseña wifi";
 
 // -------- TELEGRAM --------
-#define BOT_TOKEN "8689745546:AAF3F2nJPecoRRT1sVCOu-ghOBwJXIfDqPE"
-#define CHAT_ID "8462815235"
+#define BOT_TOKEN "ingrese su bot token"
+#define CHAT_ID "ingrese su chat_id"
 
 // -------- FIREBASE --------
-#define FIREBASE_HOST "proyecto-rfid-4d86f-default-rtdb.firebaseio.com"
+#define FIREBASE_HOST "ingrese su url"
 
-#define FIREBASE_AUTH "J5awsCQTrZiGFMRRmmokmuQEfAd6iWyTg267rNHY"
+#define FIREBASE_AUTH "imgrese su secret"
 
 FirebaseData fbdo;
 FirebaseConfig fbConfig;
