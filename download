@@ -1,0 +1,19 @@
+# Credenciales reales - NUNCA subir al repositorio
+firmware/config.h
+
+# Archivos temporales de Arduino IDE
+*.tmp
+build/
+*.bin
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Fusion 360 backups
+*.f3d.lock
+*~recover*
+
+# Editores
+.vscode/
+.idea/
