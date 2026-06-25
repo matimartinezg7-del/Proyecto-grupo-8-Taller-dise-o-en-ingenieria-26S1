@@ -1,0 +1,123 @@
+
+Prueba 1 — Funcionamiento integral: lectura RFID + envío por Telegram
+
+Esta fue la primera prueba realizada y valida el núcleo del sistema: que el
+lector capture la etiqueta y que la información correcta llegue al usuario.
+
+
+Objetivo: verificar que, al acercar una etiqueta RFID, el lector la
+identifica correctamente y el bot de Telegram envía un mensaje con los datos
+correctos del alimento (nombre, fecha de ingreso y fecha de expiración).
+Condiciones: ESP32 + RC522 alimentados y conectados a WiFi, bot
+de Telegram configurado, Monitor Serial abierto a 115200 baudios.
+Procedimiento:
+
+Acercar una etiqueta RFID registrada al lector.
+Verificar en el Monitor Serial que se lee el UID y se identifica el alimento.
+Comprobar que llega el mensaje al chat de Telegram.
+Verificar que los datos del mensaje (nombre, fechas) son correctos.
+Repetir con varias etiquetas distintas.
+
+
+
+Criterio de éxito: cada etiqueta se identifica correctamente y el mensaje
+de Telegram llega con la información correspondiente al alimento escaneado.
+Resultado: Se probaron varias etiquetas; todas se leyeron
+correctamente y el mensaje de Telegram llegó con los datos correctos en todos
+los casos, incluyendo el caso en que el UID no este registrado en el cual muestra UID no reconocido.
+Evidencia:
+
+Falla detectada y solución (análisis técnico)
+
+Durante el desarrollo, una versión previa del prototipo —construida sobre una
+placa ESP32— presentaba reinicios intermitentes en el arranque. En el
+Monitor Serial aparecían errores de boot (invalid header) y un reinicio por
+watchdog; el LED de la placa parpadeaba de forma inestable.
+
+
+Diagnóstico: se descartó por pasos la causa. No era el cableado ni las
+soldaduras (el fallo se reproducía igual en protoboard, sin soldadura de por
+medio), ni el cable USB (se probó con otro de buena calidad). El síntoma
+apuntaba a una caída de tensión en el arranque: el RC522 demanda un pico de
+corriente al inicializarse que, sumado al consumo del radio WiFi, hacía caer la
+alimentación de la placa por debajo del umbral estable.
+Solución aplicada: se reemplazó la placa ESP32 por una NodeMCU ESP8266.
+Con el ESP8266, el sistema arrancó de forma estable y los reinicios
+desaparecieron. Esto implicó adaptar el firmware al ESP8266 (librería
+ESP8266WiFi.h en lugar de la del ESP32, y el mapeo de pines D1/D2/D5/D6/D7
+para el bus SPI del RC522).
+Verificación: tras el cambio de placa, el mensaje de inicio llegó por
+Telegram de forma consistente en encendidos sucesivos, la hora se sincronizó
+correctamente por NTP y las etiquetas se leyeron sin reinicios.
+Interpretación: el cambio de placa resolvió el síntoma en la práctica. Es
+probable que el regulador de 3.3V de la NodeMCU usada tolerara mejor los picos
+de corriente del RC522 que el de la placa ESP32 anterior. Como medida de
+robustez adicional para la instalación definitiva, se recomienda alimentar el
+dispositivo con un cargador de pared USB (5V/1A o más) en lugar del puerto USB
+de la PC, que limita corriente.
+
+
+
+Prueba 2 — Persistencia de datos en Firebase y hora correcta
+
+
+Objetivo: confirmar que cada lectura se guarda en la nube con fecha/hora
+reales y persiste tras reiniciar el dispositivo.
+Procedimiento:
+
+Registrar 3 alimentos.
+Verificar en la consola de Firebase que aparecen bajo /alimentos con
+fecha de ingreso y de expiración correctas.
+Reiniciar el ESP8266 y recargar el dashboard; confirmar que siguen presentes.
+
+
+
+Criterio de éxito: los 3 registros persisten y muestran fecha/hora reales
+(no la fecha por defecto 1/1/1970), lo que confirma que la sincronización NTP
+funciona.
+Resultado: Se dio que los registros se completaron 
+Evidencia:
+
+
+
+Prueba 3 — Información útil en el dashboard (cuenta regresiva y urgencia)
+
+
+Objetivo: validar que el dashboard transforma los datos crudos en
+información accionable: cuenta regresiva al vencimiento y semáforo de urgencia.
+Procedimiento:
+
+Registrar alimentos con distintas duraciones (1, 2 y 5 días).
+Verificar el color asignado contra la regla: rojo (<1 día o vencido),
+amarillo (1–3 días), verde (>3 días).
+Confirmar que la lista se ordena por urgencia y se actualiza en tiempo real
+al registrar un alimento nuevo, sin recargar la página.
+
+
+
+Criterio de éxito: el color y el orden coinciden con lo esperado en los 3
+casos, y el alimento nuevo aparece solo gracias al listener onValue.
+Resultado: El color coincide con lo que se propone para todos los casos posibles y esta ordenado de manera correcta.
+Evidencia: 
+
+
+
+Validación contra el problema original (Avance 1)
+
+Las pruebas confirman que el sistema responde a ese problema de punta a punta:
+
+
+Captura confiable (Pruebas 1): el dispositivo lee cada alimento y
+comunica la información correcta, de forma estable tras resolver la falla de
+arranque con el cambio de placa.
+Información persistente (Prueba 2): los datos quedan guardados en la nube
+con su fecha de vencimiento, disponibles para consulta histórica.
+Información accionable (Prueba 3): el dashboard no muestra datos crudos,
+sino una lista priorizada por urgencia con cuenta regresiva, que le permite al
+usuario decidir qué consumir primero. Además, la notificación por Telegram
+avisa en cada ingreso.
+
+
+Esto demuestra que el sistema captura datos reales, los convierte en información
+útil y permite tomar una decisión concreta —qué comer antes de que expire—,
+que es exactamente la necesidad detectada en el Avance 1.
